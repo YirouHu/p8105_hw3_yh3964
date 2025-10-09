@@ -68,6 +68,27 @@ The whole dataset provides detailed information on each product that customers o
 
 There are `r length(unique(instacart$aisle))` aisles and `r aisles_number_df$aisle[which(aisles_number_df$aisle_rank ==1)]` is the aisle with the most items ordered from.
 
+## Make a plot that shows the number of items ordered in each aisle, limiting this to aisles with more than 10000 items ordered. Arrange aisles sensibly, and organize your plot so others can read it.
+
+```{r, fig.width = 20, fig.height = 25}
+instacart |>
+  group_by(aisle) |>
+  summarize(count_aisle = n()) |>
+  arrange(count_aisle) |>
+  filter(count_aisle > 10000) |>
+  ggplot(aes(x = count_aisle, y = reorder(aisle, -count_aisle))) +
+  geom_bar(stat = "identity", fill = "blue", alpha = 0.5) +
+  labs(                                             
+    title = "Number of Items Ordered in Each Aisle",
+    x = "Number of Items Ordered",
+    y = "Aisle"
+  ) 
+```
+
+Plot description:
+
+This bar chart shows the number of items ordered from each aisle. It's clear that "fresh vegetables" and "fresh fruits" are the most popular, with the highest order counts. Other top sellers include "packaged vegetables and fruits," "yogurt," and "packaged cheese." Less ordered items come from aisles like "butter" and "oils vinegars," yet they still exceed 10,000 orders. This chart helps identify which products are in highest demand.
+
 
 
 
