@@ -89,7 +89,38 @@ Plot description:
 
 This bar chart shows the number of items ordered from each aisle. It's clear that "fresh vegetables" and "fresh fruits" are the most popular, with the highest order counts. Other top sellers include "packaged vegetables and fruits," "yogurt," and "packaged cheese." Less ordered items come from aisles like "butter" and "oils vinegars," yet they still exceed 10,000 orders. This chart helps identify which products are in highest demand.
 
+## Make a table showing the three most popular items in each of the aisles “baking ingredients”, “dog food care”, and “packaged vegetables fruits”. Include the number of times each item is ordered in your table.
 
+```{r}
+popular_items_df = 
+  instacart |>
+  filter(aisle %in% c("baking ingredients", "dog food care", "packaged vegetables fruits")) |>
+  group_by(aisle, product_name) |>
+  summarise(number_of_time = n()) |>
+  mutate(rank_of_time = rank(desc(number_of_time))) |>
+  arrange(rank_of_time) |>
+  filter(rank_of_time == c(1,2,3)) |>
+  arrange(desc(number_of_time)) 
+
+popular_items_df |>
+  knitr::kable(col.names = c("Aisle", "Product Name", "Number of times ordered", "Rank"))
+```
+
+## Make a table showing the mean hour of the day at which Pink Lady Apples and Coffee Ice Cream are ordered on each day of the week; format this table for human readers (i.e. produce a 2 x 7 table).
+
+```{r}
+instacart |>
+  filter(product_name %in% c("Pink Lady Apples", "Coffee Ice Cream")) |>
+  group_by(product_name, order_dow) |>
+  summarise(mean_order_hour_of_day = mean(order_hour_of_day)) |>
+  pivot_wider(
+    names_from = order_dow,
+    values_from = mean_order_hour_of_day
+  ) |>
+  knitr::kable() 
+```
+
+The table shows the average ordering hours for "Pink Lady Apples" and "Coffee Ice Cream" by day of the week. "Coffee Ice Cream" orders peak mid-week, especially on Wednesdays around 15 hours. "Pink Lady Apples" are most ordered on Thursdays around 14 hours. 
 
 
 
