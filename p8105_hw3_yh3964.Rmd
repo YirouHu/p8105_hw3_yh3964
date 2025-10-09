@@ -159,7 +159,19 @@ zillow_rent_df =
 
 We merge them together
 ```{r}
-zip_zillow_merge_df = left_join(zillow_rent_df, zip_codes_df, by = "zip_code")
+zip_zillow_merge_df =
+  left_join(zillow_rent_df, zip_codes_df, by = "zip_code") |>
+  separate(Date, into = c("year", "month", "day"), sep = "-") |>
+  mutate(
+    borough = case_match(
+    county_name,
+      "Bronx County" ~ "Bronx",
+      "Kings County" ~ "Brooklyn",
+      "New York County" ~ "Manhattan",
+      "Queens County" ~ "Queens",
+      "Richmond County" ~ "Staten Island"
+    )
+  )
 ```
 
 ## There are 116 months between January 2015 and August 2024. How many ZIP codes are observed 116 times? How many are observed fewer than 10 times? Why are some ZIP codes are observed rarely and others observed in each month?
@@ -177,17 +189,6 @@ Answer:
 ```{r}
 average_rent_df =
   zip_zillow_merge_df |> 
-  separate(Date, into = c("year", "month", "day"), sep = "-") |>
-  mutate(
-    borough = case_match(
-    county_name,
-      "Bronx County" ~ "Bronx",
-      "Kings County" ~ "Brooklyn",
-      "New York County" ~ "Manhattan",
-      "Queens County" ~ "Queens",
-      "Richmond County" ~ "Staten Island"
-    )
-   ) |>
   group_by(borough, year) |> 
   summarize(
     average_rent_price = mean(Zori, na.rm = TRUE)
@@ -207,7 +208,61 @@ Comments on table:
 - Staten Island: Data for Staten Island begins in 2020, and it shows a steady increase in rental prices from that year through 2024, with the average rent rising from $1,977 to $2,536.
 - In summary, the table indicates a overall increase in rental prices across all boroughs over the ten-year span, with Manhattan maintaining the highest rents and The Bronx starting with the lowest but showing a significant increase in recent years.
 
+## Make a plot showing NYC Rental Prices within ZIP codes for all available years. Your plot should facilitate comparisons across boroughs. Comment on any significant elements of this plot.
+
+```{r, fig.width = 10, fig.height = 30} 
+prices_year_plot =
+zip_zillow_merge_df |> 
+  group_by(year, zip_code, borough) |> 
+  ggplot(aes(x = year, y = Zori)) +
+  geom_point(color = "red", alpha = 0.3) +
+  geom_line(alpha = 0.4, linewidth = 0.5) +
+  labs(
+    x = "Borough",
+    y = "NYC Rental Prices",
+    title = "Rental Prices Across Different Boroughs"
+  ) +
+  facet_wrap(~ borough, ncol = 2, nrow = 3) +
+  theme(axis.text.x = element_text(angle = 0, hjust = 1, vjust = .5))
+
+prices_year_plot
+```
+
+Comments on plot:
+
+- The plot illustrates the rental price trends across different boroughs of NYC from 2015 to 2024. All boroughs exhibit a general upward trend in rental prices over the years, reflecting a growing demand or increasing cost of living. The range of prices within each borough varies, with Manhattan showing the most significant variability, suggesting diverse rental options.
+- Manhattan : Manhattan consistently shows the highest rental prices across all years, indicating a strong and possibly exclusive rental market.
+- Staten Island : Staten Island starts with the lowest prices but shows a notable increase towards 2024.
 
 
+## Compute the average rental price within each ZIP code over each month in 2023. Make a reader-friendly plot showing the distribution of ZIP-code-level rental prices across boroughs; put differently, your plot should facilitate the comparison of the distribution of average rental prices across boroughs. Comment on this plot
+
+```{r fig.width = 20, fig.height = 30}
+average_price_plot =
+zip_zillow_merge_df |> 
+  filter(year == 2023) |> 
+  group_by(month, zip_code, borough) |> 
+  summarize(
+    average_rent_price = mean(Zori, na.rm = TRUE)
+  ) |> 
+  ggplot(aes(x = borough, average_rent_price)) +
+  geom_violin(aes(fill = borough), alpha = 0.5) +
+  labs(
+    x = "Borough",
+    y = "NYC Average Rental Price",
+    title = "Comparison of Distribution of Average Rental Prices Across Boroughs in 2023 ",
+  ) + 
+  theme(axis.text.x = element_text(angle = 0, hjust = 1, vjust = 0.5))
+
+average_price_plot
+```
+
+Comments on the plot:
+
+- The violin plot illustrates the distribution of average rental prices across different boroughs of New York City for the year 2023. Manhattan displays the broadest range of rental prices, indicating significant variability in the housing market.
+- The thickest part of each violin plot, representing the median, shows that Manhattan also has the highest median rental price, followed by Brooklyn, Queens, The Bronx, and Staten Island.
+- The shape of the violin plots reveals the skewness of the rental price distributions. Manhattan and Brooklyn show a right-skewed distribution, suggesting a few extremely high rental prices.
+- The width of the violins indicates the spread of rental prices. Queens and The Bronx have narrower violins, suggesting a more concentrated rental price range compared to Manhattan and Brooklyn.
+- The thin ends of the violin plots suggest the presence of outliers, particularly in Manhattan, where there are a few ZIP codes with substantially higher rental prices.
 
 
