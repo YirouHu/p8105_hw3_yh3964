@@ -172,9 +172,40 @@ Answer:
 - Furthermore, some ZIP codes may contain industrial zones, commercial areas, parks, or other non-residential regions, where typical rental data is unavailable.
 - Moreover, there exists missing ZIP codes correspond to areas with smaller populations or fewer rental units. Zillow may not have enough transactions to generate reliable rental price estimates.
 
-## 
+## Create a reader-friendly table showing the average rental price in each borough and year (not month). Comment on trends in this table.
 
+```{r}
+average_rent_df =
+  zip_zillow_merge_df |> 
+  separate(Date, into = c("year", "month", "day"), sep = "-") |>
+  mutate(
+    borough = case_match(
+    county_name,
+      "Bronx County" ~ "Bronx",
+      "Kings County" ~ "Brooklyn",
+      "New York County" ~ "Manhattan",
+      "Queens County" ~ "Queens",
+      "Richmond County" ~ "Staten Island"
+    )
+   ) |>
+  group_by(borough, year) |> 
+  summarize(
+    average_rent_price = mean(Zori, na.rm = TRUE)
+  ) 
+  
+average_rent_df |>  
+  knitr::kable()
+```
 
+Comments on table: 
+
+- The table presents the average rental prices for different boroughs of New York City from 2015 to 2024. All boroughs have seen an increase in average rental prices over the decade. This suggests a general trend of rising rents across the city.
+- Manhattan: Manhattan has the highest average rental prices throughout the period, with a noticeable increase from $3,022 in 2015 to $4,078 in 2024. The largest year-over-year increase appears between 2022 and 2023.
+- Brooklyn: Brooklyn starts with lower rents compared to Manhattan but shows a steady increase, reaching $3,126 by 2024. The most significant rise occurs between 2021 and 2022.
+- Queens: Queens also exhibits a consistent upward trend, with rents rising from $2,214 in 2015 to $2,694 in 2024. The increase is more gradual compared to Manhattan and Brooklyn.
+- Bronx: Starting with the lowest average rents among the boroughs, Bronx sees a gradual increase over the years, with a more pronounced rise from 2021 onwards, reaching $2,496 in 2024.
+- Staten Island: Data for Staten Island begins in 2020, and it shows a steady increase in rental prices from that year through 2024, with the average rent rising from $1,977 to $2,536.
+- In summary, the table indicates a overall increase in rental prices across all boroughs over the ten-year span, with Manhattan maintaining the highest rents and The Bronx starting with the lowest but showing a significant increase in recent years.
 
 
 
