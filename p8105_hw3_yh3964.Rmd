@@ -338,4 +338,57 @@ Comments:
 - Women dominate the "More than high school" category, while men are slightly more prevalent in the "Less than high school" group.
 - Each education group shows distinct age clustering, with the "High school equivalent" group displaying a broader age range.
 
-## Traditional analyses of accelerometer data focus on the total activity over the day. Using your tidied dataset, aggregate across minutes to create a total activity variable for each participant. Plot these total activities (y-axis) against age (x-axis); your plot should compare men to women and have separate panels for each education level. Include a trend line or a smooth to illustrate differences. Comment on your plot.
+Visualization of the age distributions for men and women in each education category
+
+```{r}
+dem_acc_df |>
+  ggplot(aes(x = education, y = age, fill = sex, alpha = 0.6)) +
+  geom_boxplot() +
+  labs(
+    x = "Education",
+    y = "Age",
+    title = "Age Distributions for Men and Women in Each Education Category",
+    fill = "Sex"
+  ) +
+  theme(legend.position = "bottom")
+```
+
+Comments on the plots:
+
+- This boxplot illustrates the age distributions for men and women across three education categories. 
+- The median age is relatively consistent across education levels for both genders, with a slight increase observed in the "More than high school" category.
+- There's a noticeable overlap in age distributions between men and women within each education category, suggesting similar age profiles regardless of education level.
+
+
+## Traditional analyses of accelerometer data focus on the total activity over the day. Using your tidied dataset, aggregate across minutes to create a total activity variable for each participant. 
+
+- Plot these total activities (y-axis) against age (x-axis); 
+- your plot should compare men to women and have separate panels for each education level. 
+- Include a trend line or a smooth to illustrate differences. Comment on your plot.
+
+```{r}
+dem_acc_df |> 
+  group_by(seqn, age, education, sex) |> 
+  summarize(
+    total_activity = sum(mims)
+  ) |> 
+  ggplot(aes(x = age, y = total_activity, color = sex)) +
+  geom_point(size = 0.5) +
+  geom_smooth(se = FALSE) +
+  facet_grid(. ~ education) +
+  labs(
+    x = "Age",
+    y = "Total Daily Activity",
+    title = "Total Daily Activity Regarding Age, Sex, and Education Level",
+  )
+```
+
+Comments on the plots:
+
+- The plot shows the relationship between age and total daily activity, based on sex and education level. Across all education levels, there is a general decline in total daily activity with increasing age, as depicted by the downward trend lines.
+- For each education level, the trend lines suggest that women tend to have higher or similar total daily activity than men, particularly noticeable in the "More than HS" and "HS Equivalent" categories.
+- The "More than HS" category shows a less age-related decline in activity compared to the other education levels, indicating that higher education might be associated with maintaining higher activity levels as age increases.
+- The total daily activity decreases the most across age groups in those with an education level "Less than HS".
+
+
+
