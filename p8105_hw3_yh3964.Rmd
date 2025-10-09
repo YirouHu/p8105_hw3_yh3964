@@ -277,6 +277,7 @@ ggsave(filename = "D:/硕士/研一/Data Science I/hw/p8105_hw3_yh3964/p8105_hw3
 This problem uses accelerometer data collected on 250 participants in the NHANES study.
 
 Load, tidy, merge, and otherwise organize the data sets. 
+
 - Your final dataset should include all originally observed variables; 
 - exclude participants less than 21 years of age, and those with missing demographic data; 
 - and encode data with reasonable variable classes (i.e. not numeric, and using factors with the ordering of tables and plots in mind).
@@ -331,3 +332,10 @@ dem_acc_df |>
 
 ```
 
+Comments:
+
+- Higher education correlates with a younger demographic, particularly noticeable in the "More than high school" group.
+- Women dominate the "More than high school" category, while men are slightly more prevalent in the "Less than high school" group.
+- Each education group shows distinct age clustering, with the "High school equivalent" group displaying a broader age range.
+
+## Traditional analyses of accelerometer data focus on the total activity over the day. Using your tidied dataset, aggregate across minutes to create a total activity variable for each participant. Plot these total activities (y-axis) against age (x-axis); your plot should compare men to women and have separate panels for each education level. Include a trend line or a smooth to illustrate differences. Comment on your plot.
